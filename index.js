@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import envConfig from "./config/env.config.js";
 import cors from "cors";
 import { format } from "date-fns";
+import adminViewRoutes from "./routes/admin/admin.routes.js";
 
 dotenv.config();
 
@@ -43,6 +44,9 @@ app.get("/health", async (req, res) => {
   });
 });
 //END::Health Check
+
+// app.use("/api", webApiRoutes);
+app.use("/admin", adminViewRoutes);
 
 const PORT = 4000;
 

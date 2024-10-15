@@ -1,9 +1,17 @@
 import express from "express";
+import "express-group-routes";
 import {
-  createMenu,
-  dashboard,
+  createDish,
+  deleteDish,
+  getAlldishes,
+  getDish,
+  updateDish,
 } from "../../controller/admin/admin.controller.js";
 import { signIn } from "../../controller/admin/adminAuth.controller.js";
+import {
+  createCategory,
+  getAllCategories,
+} from "../../controller/admin/admin.categories.js";
 
 const router = express.Router();
 
@@ -13,14 +21,23 @@ router.post("/sign-in", signIn);
 
 // router.use(AdminAuthCheck);
 
-router.get("/dashboard", dashboard);
+router.group("/dishes", (router) => {
+  router.get("/", getAlldishes);
+  router.get("/:id", getDish);
+  router.post("/create", createDish);
+  router.delete("/:id", deleteDish);
+  router.patch("/:id", updateDish);
+});
 
-// router.get("/:id", getFoodItem);
+router.group("/categories", (router) => {
+  router.get("/", getAllCategories);
+  router.post("/createCategory", createCategory);
+});
 
-router.post("/", createMenu);
+// router.get("/catagory/:id", getCategory);
 
-// router.delete("/:id", deleteFoodItem);
+// router.delete("/category/:id", deleteCategory);
 
-// router.patch("/:id", updateFoodItem);
+// router.patch("/category/:id", updateCategory);
 
 export default router;

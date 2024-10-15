@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const SubmissionSchema = new mongoose.Schema(
   {
@@ -13,9 +13,19 @@ const SubmissionSchema = new mongoose.Schema(
     },
 
     price: {
-      type: String,
+      type: Number,
       required: true,
     },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "category",
+    },
+    modifiers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "modifier",
+      },
+    ],
   },
   {
     timestamps: {
@@ -25,6 +35,6 @@ const SubmissionSchema = new mongoose.Schema(
   }
 );
 
-const Submissions = mongoose.model("Submission", SubmissionSchema);
+const Submissions = mongoose.model("submission", SubmissionSchema);
 
 export default Submissions;

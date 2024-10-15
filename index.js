@@ -48,7 +48,7 @@ app.get("/health", async (req, res) => {
 // app.use("/api", webApiRoutes);
 app.use("/admin", adminViewRoutes);
 
-const PORT = 4000;
+const PORT = 3000;
 
 app.listen(process.env.PORT, () => {
   console.log(`Server Running on ${PORT}`);

@@ -1,18 +1,13 @@
 import mongoose from "mongoose";
 
-const adminSchema = new mongoose.Schema(
+const modifierSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
     },
 
-    email: {
-      type: String,
-      required: true,
-    },
-
-    password: {
+    price: {
       type: String,
       required: true,
     },
@@ -25,6 +20,6 @@ const adminSchema = new mongoose.Schema(
   }
 );
 
-const Admin = mongoose.model("admin", adminSchema);
+const Modifiers = mongoose.model("modifier", modifierSchema);
 
-export default Admin;
+export default Modifiers;

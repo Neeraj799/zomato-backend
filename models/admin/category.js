@@ -1,18 +1,13 @@
 import mongoose from "mongoose";
 
-const adminSchema = new mongoose.Schema(
+const categorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
     },
 
-    email: {
-      type: String,
-      required: true,
-    },
-
-    password: {
+    description: {
       type: String,
       required: true,
     },
@@ -25,6 +20,6 @@ const adminSchema = new mongoose.Schema(
   }
 );
 
-const Admin = mongoose.model("admin", adminSchema);
+const Category = mongoose.model("category", categorySchema);
 
-export default Admin;
+export default Category;

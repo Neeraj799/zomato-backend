@@ -16,10 +16,15 @@ const SubmissionSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    image: {
+      type: [String],
+    },
+
     category: {
       type: Schema.Types.ObjectId,
       ref: "category",
     },
+
     modifiers: [
       {
         type: Schema.Types.ObjectId,

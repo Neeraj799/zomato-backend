@@ -1,3 +1,4 @@
+import { imageUploadHelper } from "../../helpers/imageKit.helper.js";
 import Submissions from "../../models/admin/submission.js";
 
 const getAlldishes = async (req, res) => {
@@ -8,54 +9,77 @@ const getAlldishes = async (req, res) => {
 
     return res.status(200).json(dishes);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 const createDish = async (req, res) => {
-  const { title, description, price, category, modifiers } = req.body;
+  const { title, description, price } = req.body;
 
   try {
-    const dish = new Submissions({
+    const folder = "Dishes";
+    let uploadFile;
+
+    if (req.files) {
+      console.log(req.files);
+      uploadFile = await imageUploadHelper(req.files, folder, "dish");
+    }
+
+    const newDish = new Submissions({
       title,
       description,
       price,
-      category,
-      modifiers,
     });
 
-    let data = await dish.save();
+    if (uploadFile) {
+      newDish.image = uploadFile;
+    }
+
+    let data = await newDish.save();
+    console.log(data);
 
     return res.status(200).json({
       success: true,
       message: "Dish created successfully",
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 const getDish = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const dish = await Submissions.findById(id);
+    const dish = await Submissions.findById(id);
 
-  if (!dish) {
-    return res.status(404).json({ error: "No such dish available" });
+    if (!dish) {
+      return res.status(404).json({ error: "No such dish available" });
+    }
+
+    return res.status(200).json(dish);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
-
-  return res.status(200).json(dish);
 };
 
 const deleteDish = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const dish = await Submissions.findByIdAndDelete({ _id: id });
+    const dish = await Submissions.findByIdAndDelete({ _id: id });
 
-  if (!dish) {
-    return res.status(404).json({ error: "No such dish available" });
+    if (!dish) {
+      return res.status(404).json({ error: "No such dish available" });
+    }
+    return res.status(200).json({ message: "Dish deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
-  return res.status(200).json(dish);
 };
 
 const updateDish = async (req, res) => {
@@ -78,7 +102,7 @@ const updateDish = async (req, res) => {
     );
 
     if (!updatedDish) {
-      return res.status(404).json({ message: "Dish not found" });
+      return res.status(404).json({ error: "Dish not found" });
     }
 
     return res.status(200).json({

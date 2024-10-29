@@ -1,0 +1,54 @@
+import ImageKit from "imagekit";
+import fs from "fs";
+import envConfig from "../config/env.config.js";
+import Media from "../models/admin/media.js";
+
+// Initialize ImageKit client
+const imagekit = new ImageKit({
+  publicKey: envConfig.imagekit.PUBLIC_KEY,
+  privateKey: envConfig.imagekit.PRIVATE_KEY,
+  urlEndpoint: envConfig.imagekit.URL,
+});
+
+const imageUploadHelper = async (files, folder, category) => {
+  try {
+    const uploadedImages = [];
+    let baseFolder =
+      `${envConfig.imagekit?.FOLDER?.toLowerCase()}/${envConfig.general?.NODE_ENV?.toLowerCase()}` ||
+      "RestaurantMedia";
+
+    for (const file of files) {
+      const uploadedImage = await imagekit.upload({
+        folder: `${baseFolder}/${folder}`,
+        file: fs.createReadStream(file.path),
+        fileName: file?.originalname?.toLowerCase() || "sample-image",
+      });
+
+      fs.unlinkSync(file.path);
+
+      const insertImage = await Media.create({
+        url: uploadedImage.url,
+        meta: {
+          title: uploadedImage.name,
+          alt_text: "",
+        },
+        response: uploadedImage,
+        file: {
+          name: uploadedImage.name,
+        },
+        file_type: file.mimetype,
+        category: category,
+        folder: `${baseFolder}/${folder}`,
+      });
+
+      // Correctly push the inserted image URL to the uploadedImages array
+      uploadedImages.push(insertImage.url);
+    }
+    return uploadedImages;
+  } catch (error) {
+    console.log("Image upload failed", error);
+    return error;
+  }
+};
+
+export { imageUploadHelper };

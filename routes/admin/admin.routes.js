@@ -10,8 +10,21 @@ import {
 import { signIn } from "../../controller/admin/adminAuth.controller.js";
 import {
   createCategory,
+  deleteCategory,
   getAllCategories,
+  getCategory,
+  updateCategory,
 } from "../../controller/admin/admin.categories.js";
+import multer from "multer";
+import {
+  createModifier,
+  deleteModifier,
+  getAllModifiers,
+  getModifier,
+  updateModifier,
+} from "../../controller/admin/admin.modifiers.js";
+
+const upload = multer({ dest: "uploads/" });
 
 const router = express.Router();
 
@@ -24,7 +37,7 @@ router.post("/sign-in", signIn);
 router.group("/dishes", (router) => {
   router.get("/", getAlldishes);
   router.get("/:id", getDish);
-  router.post("/create", createDish);
+  router.post("/create", upload.any(), createDish);
   router.delete("/:id", deleteDish);
   router.patch("/:id", updateDish);
 });
@@ -32,12 +45,17 @@ router.group("/dishes", (router) => {
 router.group("/categories", (router) => {
   router.get("/", getAllCategories);
   router.post("/createCategory", createCategory);
+  router.get("/:id", getCategory);
+  router.patch("/:id", updateCategory);
+  router.delete("/:id", deleteCategory);
 });
 
-// router.get("/catagory/:id", getCategory);
-
-// router.delete("/category/:id", deleteCategory);
-
-// router.patch("/category/:id", updateCategory);
+router.group("/modifiers", (router) => {
+  router.get("/", getAllModifiers);
+  router.post("/create", createModifier);
+  router.get("/:id", getModifier);
+  router.patch("/:id", updateModifier);
+  router.delete("/:id", deleteModifier);
+});
 
 export default router;

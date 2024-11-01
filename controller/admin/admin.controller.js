@@ -15,7 +15,7 @@ const getAlldishes = async (req, res) => {
 };
 
 const createDish = async (req, res) => {
-  const { title, description, price } = req.body;
+  const { title, description, price, category, modifiers } = req.body;
 
   try {
     const folder = "Dishes";
@@ -30,6 +30,8 @@ const createDish = async (req, res) => {
       title,
       description,
       price,
+      category,
+      modifiers,
     });
 
     if (uploadFile) {

@@ -44,7 +44,7 @@ router.group("/dishes", (router) => {
 
 router.group("/categories", (router) => {
   router.get("/", getAllCategories);
-  router.post("/createCategory", createCategory);
+  router.post("/createCategory", upload.any(), createCategory);
   router.get("/:id", getCategory);
   router.patch("/:id", updateCategory);
   router.delete("/:id", deleteCategory);
@@ -52,7 +52,7 @@ router.group("/categories", (router) => {
 
 router.group("/modifiers", (router) => {
   router.get("/", getAllModifiers);
-  router.post("/create", createModifier);
+  router.post("/create", upload.any(), createModifier);
   router.get("/:id", getModifier);
   router.patch("/:id", updateModifier);
   router.delete("/:id", deleteModifier);

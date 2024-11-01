@@ -26,8 +26,13 @@ const imageUploadHelper = async (files, folder, category) => {
 
       fs.unlinkSync(file.path);
 
+      const transformedUrl = imagekit.url({
+        src: uploadedImage.url,
+        transformation: [{ width: "250", height: "200" }],
+      });
+
       const insertImage = await Media.create({
-        url: uploadedImage.url,
+        url: transformedUrl,
         meta: {
           title: uploadedImage.name,
           alt_text: "",
@@ -41,7 +46,6 @@ const imageUploadHelper = async (files, folder, category) => {
         folder: `${baseFolder}/${folder}`,
       });
 
-      // Correctly push the inserted image URL to the uploadedImages array
       uploadedImages.push(insertImage.url);
     }
     return uploadedImages;

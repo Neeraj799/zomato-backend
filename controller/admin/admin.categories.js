@@ -30,7 +30,7 @@ const createCategory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json("Internal Server error");
+    return res.status(500).json("Internal Server error");
   }
 };
 
@@ -77,7 +77,7 @@ const updateCategory = async (req, res) => {
       description,
     };
 
-    const updatedDish = await Category.findByIdAndUpdate(
+    const updatedCategory = await Category.findByIdAndUpdate(
       id,
       {
         $set: updatedData,
@@ -86,13 +86,13 @@ const updateCategory = async (req, res) => {
     );
 
     if (!updatedDish) {
-      return res.status(404).json({ message: "Dish not found" });
+      return res.status(404).json({ message: "Category not found" });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Dish updated successfully",
-      submission: updatedDish,
+      message: "Category updated successfully",
+      submission: updatedCategory,
     });
   } catch (error) {
     console.error(error);

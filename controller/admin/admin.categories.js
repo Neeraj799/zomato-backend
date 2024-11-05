@@ -1,3 +1,4 @@
+import { imageUploadHelper } from "../../helpers/imageKit.helper.js";
 import Category from "../../models/admin/category.js";
 
 const getAllCategories = async (req, res) => {
@@ -16,10 +17,22 @@ const createCategory = async (req, res) => {
   const { name, description } = req.body;
 
   try {
+    const folder = "Category";
+    let uploadFile;
+
+    if (req.files) {
+      console.log(req.files);
+      uploadFile = await imageUploadHelper(req.files, folder, "category");
+    }
+
     const newCategory = new Category({
       name,
       description,
     });
+
+    if (uploadFile) {
+      newCategory.image = uploadFile;
+    }
 
     let data = await newCategory.save();
     console.log(data);

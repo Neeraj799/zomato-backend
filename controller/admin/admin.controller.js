@@ -3,7 +3,10 @@ import Submissions from "../../models/admin/submission.js";
 
 const getAlldishes = async (req, res) => {
   try {
-    const dishes = await Submissions.find({}).sort({ createdAt: -1 });
+    const dishes = await Submissions.find({})
+      .populate("category")
+      .populate("modifiers")
+      .sort({ created_at: -1 });
 
     console.log(dishes);
 

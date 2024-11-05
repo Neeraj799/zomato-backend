@@ -1,3 +1,4 @@
+import { imageUploadHelper } from "../../helpers/imageKit.helper.js";
 import Modifiers from "../../models/admin/modifiers.js";
 
 const getAllModifiers = async (req, res) => {
@@ -17,10 +18,22 @@ const createModifier = async (req, res) => {
   const { name, price } = req.body;
 
   try {
+    const folder = "Modifiers";
+    let uploadFile;
+
+    if (req.files) {
+      console.log(req.files);
+      uploadFile = await imageUploadHelper(req.files, folder, "modifier");
+    }
+
     const newModifier = new Modifiers({
       name,
       price,
     });
+
+    if (uploadFile) {
+      newModifier.image = uploadFile;
+    }
 
     let data = newModifier.save();
 

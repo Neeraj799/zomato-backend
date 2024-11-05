@@ -7,7 +7,7 @@ import {
   getDish,
   updateDish,
 } from "../../controller/admin/admin.controller.js";
-import { signIn } from "../../controller/admin/adminAuth.controller.js";
+import { signIn, signUp } from "../../controller/admin/adminAuth.controller.js";
 import {
   createCategory,
   deleteCategory,
@@ -23,6 +23,7 @@ import {
   getModifier,
   updateModifier,
 } from "../../controller/admin/admin.modifiers.js";
+import { AdminAuthCheck } from "../../middleware/auth.middleware.js";
 
 const upload = multer({ dest: "uploads/" });
 
@@ -30,12 +31,10 @@ const router = express.Router();
 
 router.post("/sign-in", signIn);
 
-// router.get("sign-out", signOut);
-
-// router.use(AdminAuthCheck);
+router.post("/sign-up", signUp);
 
 router.group("/dishes", (router) => {
-  router.get("/", getAlldishes);
+  router.get("/", AdminAuthCheck, getAlldishes);
   router.get("/:id", getDish);
   router.post("/create", upload.any(), createDish);
   router.delete("/:id", deleteDish);
@@ -43,7 +42,7 @@ router.group("/dishes", (router) => {
 });
 
 router.group("/categories", (router) => {
-  router.get("/", getAllCategories);
+  router.get("/", AdminAuthCheck, getAllCategories);
   router.post("/createCategory", upload.any(), createCategory);
   router.get("/:id", getCategory);
   router.patch("/:id", updateCategory);
@@ -51,7 +50,7 @@ router.group("/categories", (router) => {
 });
 
 router.group("/modifiers", (router) => {
-  router.get("/", getAllModifiers);
+  router.get("/", AdminAuthCheck, getAllModifiers);
   router.post("/create", upload.any(), createModifier);
   router.get("/:id", getModifier);
   router.patch("/:id", updateModifier);

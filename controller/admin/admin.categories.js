@@ -98,7 +98,7 @@ const updateCategory = async (req, res) => {
       { new: true }
     );
 
-    if (!updatedDish) {
+    if (!updatedCategory) {
       return res.status(404).json({ message: "Category not found" });
     }
 

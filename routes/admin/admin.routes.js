@@ -38,14 +38,14 @@ router.group("/dishes", (router) => {
   router.get("/:id", getDish);
   router.post("/create", upload.any(), createDish);
   router.delete("/:id", deleteDish);
-  router.patch("/:id", updateDish);
+  router.patch("/:id", upload.any(), updateDish);
 });
 
 router.group("/categories", (router) => {
   router.get("/", AdminAuthCheck, getAllCategories);
   router.post("/createCategory", upload.any(), createCategory);
   router.get("/:id", getCategory);
-  router.patch("/:id", updateCategory);
+  router.patch("/:id", upload.any(), updateCategory);
   router.delete("/:id", deleteCategory);
 });
 
@@ -53,7 +53,7 @@ router.group("/modifiers", (router) => {
   router.get("/", AdminAuthCheck, getAllModifiers);
   router.post("/create", upload.any(), createModifier);
   router.get("/:id", getModifier);
-  router.patch("/:id", updateModifier);
+  router.patch("/:id", upload.any(), updateModifier);
   router.delete("/:id", deleteModifier);
 });
 

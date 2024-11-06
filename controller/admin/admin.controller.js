@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { imageUploadHelper } from "../../helpers/imageKit.helper.js";
 import Submissions from "../../models/admin/submission.js";
 
@@ -88,22 +89,33 @@ const deleteDish = async (req, res) => {
 };
 
 const updateDish = async (req, res) => {
-  console.log("hello");
-
   try {
     const { id } = req.params;
-    console.log(req.params);
 
-    const { title, description, price, category, modifiers } = req.body;
-    console.log(req.body);
+    const { title, description, price, category, modifiers, image } = req.body;
+
+    const folder = "Dishes";
+    let uploadFile;
+    if (req.files) {
+      uploadFile = await imageUploadHelper(req.files, folder, "dish");
+    }
+
+    const filteredModifiers = (modifiers || [])
+      .filter((id) => id && id !== "undefined")
+      .filter((id) => mongoose.Types.ObjectId.isValid(id));
 
     const updatedData = {
       title,
       description,
       price,
       category,
-      modifiers,
+      modifiers: filteredModifiers,
+      image: image,
     };
+
+    if (uploadFile) {
+      updatedData.image = uploadFile;
+    }
 
     const updatedDish = await Submissions.findByIdAndUpdate(
       id,
@@ -116,6 +128,7 @@ const updateDish = async (req, res) => {
     if (!updatedDish) {
       return res.status(404).json({ error: "Dish not found" });
     }
+    console.log(updatedDish);
 
     return res.status(200).json({
       success: true,

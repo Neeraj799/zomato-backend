@@ -83,12 +83,23 @@ const deleteCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, image } = req.body;
+
+    const folder = "Category";
+    let uploadFile;
+    if (req.files) {
+      uploadFile = await imageUploadHelper(req.files, folder, "category");
+    }
 
     const updatedData = {
       name,
       description,
+      image: image,
     };
+
+    if (uploadFile) {
+      updatedData.image = uploadFile;
+    }
 
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
@@ -101,7 +112,7 @@ const updateCategory = async (req, res) => {
     if (!updatedCategory) {
       return res.status(404).json({ message: "Category not found" });
     }
-
+    console.log(updatedCategory);
     return res.status(200).json({
       success: true,
       message: "Category updated successfully",

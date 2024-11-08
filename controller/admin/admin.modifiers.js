@@ -63,20 +63,18 @@ const updateModifier = async (req, res) => {
     const { id } = req.params;
     const { name, price, image } = req.body;
 
-    const folder = "Modifiers";
-    let uploadFile;
-    if (req.files) {
-      uploadFile = await imageUploadHelper(req.files, folder, "modifier");
-    }
-
     const updatedData = {
       name,
       price,
-      image: uploadFile || image,
     };
 
-    if (uploadFile) {
+    if (req.files && req.files.length > 0) {
+      const folder = "Modifiers";
+      const uploadFile = await imageUploadHelper(req.files, folder, "modifier");
       updatedData.image = uploadFile;
+    } else {
+      const existingCategory = await Modifiers.findById(id);
+      updatedData.image = existingCategory.image;
     }
 
     const updateModifier = await Modifiers.findByIdAndUpdate(

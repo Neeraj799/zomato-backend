@@ -85,20 +85,18 @@ const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name, description, image } = req.body;
 
-    const folder = "Category";
-    let uploadFile;
-    if (req.files) {
-      uploadFile = await imageUploadHelper(req.files, folder, "category");
-    }
-
     const updatedData = {
       name,
       description,
-      image: uploadFile || image,
     };
 
-    if (uploadFile) {
+    if (req.files && req.files.length > 0) {
+      const folder = "Category";
+      const uploadFile = await imageUploadHelper(req.files, folder, "category");
       updatedData.image = uploadFile;
+    } else {
+      const existingCategory = await Category.findById(id);
+      updatedData.image = existingCategory.image;
     }
 
     const updatedCategory = await Category.findByIdAndUpdate(

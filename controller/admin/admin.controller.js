@@ -25,7 +25,6 @@ const createDish = async (req, res) => {
     let uploadFile;
 
     if (req.files) {
-      console.log(req.files);
       uploadFile = await imageUploadHelper(req.files, folder, "dish");
     }
 
@@ -93,12 +92,6 @@ const updateDish = async (req, res) => {
 
     const { title, description, price, category, modifiers, image } = req.body;
 
-    const folder = "Dishes";
-    let uploadFile;
-    if (req.files) {
-      uploadFile = await imageUploadHelper(req.files, folder, "dish");
-    }
-
     const filteredModifiers = (modifiers || [])
       .filter((id) => id && id !== "undefined")
       .filter((id) => mongoose.Types.ObjectId.isValid(id));
@@ -109,11 +102,15 @@ const updateDish = async (req, res) => {
       price,
       category,
       modifiers: filteredModifiers,
-      image: uploadFile || image,
     };
 
-    if (uploadFile) {
+    if (req.files && req.files.length > 0) {
+      const folder = "Dishes";
+      const uploadFile = await imageUploadHelper(req.files, folder, "dish");
       updatedData.image = uploadFile;
+    } else {
+      const existingCategory = await Submissions.findById(id);
+      updatedData.image = existingCategory.image;
     }
 
     const updatedDish = await Submissions.findByIdAndUpdate(

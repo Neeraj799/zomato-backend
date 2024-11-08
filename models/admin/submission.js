@@ -16,6 +16,11 @@ const SubmissionSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+
+    actualPrice: {
+      type: Number,
+    },
+
     image: {
       type: [String],
     },

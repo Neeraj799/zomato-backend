@@ -94,7 +94,7 @@ const updateCategory = async (req, res) => {
     const updatedData = {
       name,
       description,
-      image: image,
+      image: uploadFile || image,
     };
 
     if (uploadFile) {

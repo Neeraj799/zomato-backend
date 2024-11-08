@@ -72,7 +72,7 @@ const updateModifier = async (req, res) => {
     const updatedData = {
       name,
       price,
-      image: image,
+      image: uploadFile || image,
     };
 
     if (uploadFile) {

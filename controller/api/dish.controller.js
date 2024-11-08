@@ -8,8 +8,6 @@ const getAlldishes = async (req, res) => {
       .populate("modifiers")
       .sort({ created_at: -1 });
 
-    console.log(dishes);
-
     return res.status(200).json(dishes);
   } catch (error) {
     console.error(error);
@@ -18,7 +16,8 @@ const getAlldishes = async (req, res) => {
 };
 
 const createDish = async (req, res) => {
-  const { title, description, price, category, modifiers } = req.body;
+  const { title, description, price, actualPrice, category, modifiers } =
+    req.body;
 
   try {
     const folder = "Dishes";
@@ -33,6 +32,7 @@ const createDish = async (req, res) => {
       title,
       description,
       price,
+      actualPrice,
       category,
       modifiers,
     });

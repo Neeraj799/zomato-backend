@@ -35,7 +35,7 @@ router.group("/dishes", (router) => {
 router.group("/categories", (router) => {
   router.get("/", getAllCategories);
   router.get("/:id", getCategory);
-  router.get("/dishes/:categoryId/:sortOrder", getSortedDishes);
+  router.get("/dishes/:categoryId", getSortedDishes);
 });
 
 router.group("/modifiers", (router) => {

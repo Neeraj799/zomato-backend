@@ -5,8 +5,6 @@ const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find({}).sort({ createdAt: -1 });
 
-    console.log(categories);
-
     return res.status(200).json(categories);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -31,26 +29,17 @@ const getCategory = async (req, res) => {
 };
 
 const getSortedDishes = async (req, res) => {
-  const { categoryId, sortOrder } = req.params;
+  const { categoryId } = req.params;
+  const { sortOrder = "asc" } = req.query;
 
   try {
-    const sortDirection = sortOrder === "asc" ? 1 : -1;
-
     const dishes = await Submissions.find({ category: categoryId }).sort({
-      price: sortDirection,
+      price: sortOrder === "asc" ? 1 : -1,
     });
-
-    if (dishes.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No dishes found in this category" });
-    }
-
-    res.status(200).json(dishes);
+    res.json(dishes);
   } catch (error) {
-    console.error("Error fetching sorted dishes:", error);
-    res.status(500).json({ message: "Server error, please try again later" });
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 export { getAllCategories, getCategory, getSortedDishes };

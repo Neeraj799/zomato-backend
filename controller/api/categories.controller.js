@@ -1,4 +1,5 @@
 import Category from "../../models/admin/category.js";
+import Submissions from "../../models/admin/submission.js";
 
 const getAllCategories = async (req, res) => {
   try {
@@ -29,4 +30,27 @@ const getCategory = async (req, res) => {
   }
 };
 
-export { getAllCategories, getCategory };
+const getSortedDishes = async (req, res) => {
+  const { categoryId, sortOrder } = req.params;
+
+  try {
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+
+    const dishes = await Submissions.find({ category: categoryId }).sort({
+      price: sortDirection,
+    });
+
+    if (dishes.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No dishes found in this category" });
+    }
+
+    res.status(200).json(dishes);
+  } catch (error) {
+    console.error("Error fetching sorted dishes:", error);
+    res.status(500).json({ message: "Server error, please try again later" });
+  }
+};
+
+export { getAllCategories, getCategory, getSortedDishes };

@@ -1,31 +1,39 @@
 import mongoose, { Schema } from "mongoose";
 
-const CartSchema = new mongoose.Schema(
+const OrderSchema = new mongoose.Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
       ref: "user",
     },
-
     items: [
       {
         dish: {
           type: Schema.Types.ObjectId,
           ref: "submission",
+          required: true,
         },
-
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
         modifiers: [
           {
             type: Schema.Types.ObjectId,
             ref: "modifier",
           },
         ],
-        quantity: {
-          type: Number,
-          required: true,
-        },
       },
     ],
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: {
@@ -35,6 +43,6 @@ const CartSchema = new mongoose.Schema(
   }
 );
 
-const Cart = mongoose.model("cart", CartSchema);
+const Orders = mongoose.model("orders", OrderSchema);
 
-export default Cart;
+export default Orders;

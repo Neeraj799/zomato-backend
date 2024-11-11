@@ -90,7 +90,7 @@ const updateDish = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { title, description, price, category, modifiers, image } = req.body;
+    const { title, description, price, category, modifiers } = req.body;
 
     const filteredModifiers = (modifiers || [])
       .filter((id) => id && id !== "undefined")

@@ -1,42 +1,57 @@
 import Cart from "../../models/admin/cart.js";
-import Modifiers from "../../models/admin/modifiers.js";
-import Submissions from "../../models/admin/submission.js";
+import Orders from "../../models/admin/order.js";
 
 const getAllCartItems = async (req, res) => {
-  try {
-    const items = await Cart.find({})
-      .populate("dish")
-      .populate("modifiers")
-      .sort({ created_at: -1 });
+  const userId = req.userId;
 
-    return res.status(200).json(items);
+  try {
+    const cart = await Cart.findOne({ user: userId })
+      .populate({
+        path: "items.dish",
+        model: "submission",
+      })
+      .populate({
+        path: "items.modifiers",
+        model: "modifier",
+      });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    res.status(200).json(cart);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: "Error fetching cart", error });
   }
 };
 
 const addToCart = async (req, res) => {
   try {
-    const { dishId, modifierIds } = req.body;
+    const userId = req.userId;
+    const { dishId, modifierIds, quantity } = req.body;
 
-    const dishes = await Submissions.findById(dishId);
+    let cart = await Cart.findOne({ user: userId });
 
-    if (!dishes) {
-      return res.status(404).json({ error: "Dishes not found" });
+    if (!cart) {
+      cart = new Cart({
+        user: userId,
+        items: [{ dish: dishId, modifiers: modifierIds, quantity }],
+      });
+    } else {
+      const existingItem = cart.items.find(
+        (item) =>
+          item.dish.toString() === dishId.toString() &&
+          JSON.stringify(item.modifiers) === JSON.stringify(modifierIds)
+      );
+
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.items.push({ dish: dishId, modifiers: modifierIds, quantity });
+      }
     }
 
-    const modifiers = await Modifiers.find({ _id: { $in: modifierIds } });
-    if (!modifiers) {
-      return res.status(404).json({ error: "Modifiers not found" });
-    }
-
-    const cartItem = new Cart({
-      dish: dishes._id,
-      modifiers: modifiers.map((mod) => mod._id),
-    });
-
-    await cartItem.save();
+    await cart.save();
 
     res.status(200).json({
       success: true,
@@ -49,18 +64,95 @@ const addToCart = async (req, res) => {
 };
 
 const deleteItem = async (req, res) => {
+  const userId = req.userId;
+  const { dishId } = req.params;
+
   try {
-    const { id } = req.params;
+    const cart = await Cart.findOne({ user: userId });
 
-    const item = await Cart.findByIdAndDelete({ _id: id });
-
-    if (!item) {
-      return res.status(404).json({ error: "No such item found" });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
     }
 
-    return res.status(200).json({ message: "Item deleted successfully" });
+    cart.items = cart.items.filter(
+      (item) => item.dish.toString() !== dishId.toString()
+    );
+
+    await cart.save();
+
+    res.status(200).json({ message: "Item removed from cart", cart });
   } catch (error) {
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: "Error removing item from cart", error });
   }
 };
-export { addToCart, getAllCartItems, deleteItem };
+
+const updateItem = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { dishId, modifierIds, quantity } = req.body;
+
+    console.log("userId", userId);
+
+    const modifiers = Array.isArray(modifierIds) ? modifierIds : [];
+
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    const item = cart.items.find(
+      (item) => item.dish.toString() === dishId.toString()
+    );
+    if (!item) {
+      return res.status(404).json({ error: "Item not found in cart" });
+    }
+
+    item.modifiers = modifiers;
+    item.quantity = quantity;
+
+    const data = await cart.save();
+    console.log(data);
+
+    res.status(200).json({
+      success: true,
+      message: "Cart item updated successfully",
+      cart,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const checkout = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { items, totalAmount, address } = req.body;
+
+    console.log(userId);
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: "Order must contain items" });
+    }
+
+    const newOrder = new Orders({
+      user: userId,
+      items,
+      totalAmount,
+      address,
+    });
+
+    const data = await newOrder.save();
+    console.log(data);
+
+    res.status(201).json({
+      message: "Order created successfully",
+      order: newOrder,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export { addToCart, getAllCartItems, deleteItem, updateItem, checkout };

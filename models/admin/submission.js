@@ -25,10 +25,12 @@ const SubmissionSchema = new mongoose.Schema(
       type: [String],
     },
 
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: "category",
-    },
+    categories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "category",
+      },
+    ],
 
     modifiers: [
       {

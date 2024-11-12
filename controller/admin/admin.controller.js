@@ -5,7 +5,7 @@ import Submissions from "../../models/admin/submission.js";
 const getAlldishes = async (req, res) => {
   try {
     const dishes = await Submissions.find({})
-      .populate("category")
+      .populate("categories")
       .populate("modifiers")
       .sort({ created_at: -1 });
 
@@ -17,7 +17,7 @@ const getAlldishes = async (req, res) => {
 };
 
 const createDish = async (req, res) => {
-  const { title, description, price, actualPrice, category, modifiers } =
+  const { title, description, price, actualPrice, categories, modifiers } =
     req.body;
 
   try {
@@ -33,7 +33,7 @@ const createDish = async (req, res) => {
       description,
       price,
       actualPrice,
-      category,
+      categories,
       modifiers,
     });
 
@@ -90,7 +90,7 @@ const updateDish = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { title, description, price, category, modifiers } = req.body;
+    const { title, description, price, categories, modifiers } = req.body;
 
     const filteredModifiers = (modifiers || [])
       .filter((id) => id && id !== "undefined")
@@ -100,7 +100,7 @@ const updateDish = async (req, res) => {
       title,
       description,
       price,
-      category,
+      categories,
       modifiers: filteredModifiers,
     };
 

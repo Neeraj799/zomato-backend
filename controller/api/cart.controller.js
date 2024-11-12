@@ -65,7 +65,7 @@ const addToCart = async (req, res) => {
 
 const deleteItem = async (req, res) => {
   const userId = req.userId;
-  const { dishId } = req.params;
+  const { itemId } = req.params;
 
   try {
     const cart = await Cart.findOne({ user: userId });
@@ -74,9 +74,17 @@ const deleteItem = async (req, res) => {
       return res.status(404).json({ message: "Cart not found" });
     }
 
-    cart.items = cart.items.filter(
-      (item) => item.dish.toString() !== dishId.toString()
+    // Find the index of the item with the given itemId
+    const itemIndex = cart.items.findIndex(
+      (item) => item._id.toString() === itemId
     );
+
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: "Item not found in the cart" });
+    }
+
+    // Remove the item from the cart
+    cart.items.splice(itemIndex, 1);
 
     await cart.save();
 
@@ -89,7 +97,8 @@ const deleteItem = async (req, res) => {
 const updateItem = async (req, res) => {
   try {
     const userId = req.userId;
-    const { dishId, modifierIds, quantity } = req.body;
+    const { itemId } = req.params;
+    const { modifierIds, quantity } = req.body;
 
     console.log("userId", userId);
 
@@ -100,18 +109,18 @@ const updateItem = async (req, res) => {
       return res.status(404).json({ error: "Cart not found" });
     }
 
-    const item = cart.items.find(
-      (item) => item.dish.toString() === dishId.toString()
+    // Find the index of the item with the given itemId
+    const itemIndex = cart.items.findIndex(
+      (item) => item._id.toString() === itemId
     );
-    if (!item) {
+    if (itemIndex === -1) {
       return res.status(404).json({ error: "Item not found in cart" });
     }
 
-    item.modifiers = modifiers;
-    item.quantity = quantity;
+    cart.items[itemIndex].modifiers = modifiers;
+    cart.items[itemIndex].quantity = quantity;
 
-    const data = await cart.save();
-    console.log(data);
+    await cart.save();
 
     res.status(200).json({
       success: true,
@@ -127,19 +136,30 @@ const updateItem = async (req, res) => {
 const checkout = async (req, res) => {
   try {
     const userId = req.userId;
-    const { items, totalAmount, address } = req.body;
+    const {
+      items,
+      totalAmount,
+      fullName,
+      mobile,
+      address,
+      city,
+      state,
+      pincode,
+    } = req.body;
 
-    console.log(userId);
-
-    if (!items || items.length === 0) {
-      return res.status(400).json({ message: "Order must contain items" });
-    }
+    console.log("data", req.body);
 
     const newOrder = new Orders({
       user: userId,
       items,
       totalAmount,
+      fullName,
+      mobile,
       address,
+      city,
+      state,
+      pincode,
+      status: "PENDING",
     });
 
     const data = await newOrder.save();

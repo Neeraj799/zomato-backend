@@ -24,7 +24,10 @@ import {
   updateModifier,
 } from "../../controller/admin/admin.modifiers.js";
 import { AdminAuthCheck } from "../../middleware/auth.middleware.js";
-import { getAllOrders } from "../../controller/admin/admin.orders.js";
+import {
+  getAllOrders,
+  updateOrderStatus,
+} from "../../controller/admin/admin.orders.js";
 import { getAllUsers } from "../../controller/admin/admin.user.js";
 
 const upload = multer({ dest: "uploads/" });
@@ -61,6 +64,7 @@ router.group("/modifiers", (router) => {
 
 router.group("/orders", (router) => {
   router.get("/", getAllOrders);
+  router.patch("/:orderId/status", updateOrderStatus);
 });
 
 router.group("/users", (router) => {

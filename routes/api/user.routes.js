@@ -2,7 +2,11 @@ import express from "express";
 import "express-group-routes";
 
 import multer from "multer";
-import { getAlldishes, getDish } from "../../controller/api/dish.controller.js";
+import {
+  getAlldishes,
+  getCategoryDishes,
+  getDish,
+} from "../../controller/api/dish.controller.js";
 import {
   getAllCategories,
   getCategory,
@@ -18,6 +22,7 @@ import {
 } from "../../controller/api/cart.controller.js";
 import { signIn, signUp } from "../../controller/api/userAuth.controller.js";
 import { UserAuthCheck } from "../../middleware/auth.middleware.js";
+import { getAllOrders } from "../../controller/api/order.controller.js";
 
 const upload = multer({ dest: "uploads/" });
 
@@ -30,6 +35,7 @@ router.post("/sign-in", signIn);
 router.group("/dishes", (router) => {
   router.get("/", getAlldishes);
   router.get("/:id", getDish);
+  router.get("/category/:categoryId", getCategoryDishes);
 });
 
 router.group("/categories", (router) => {
@@ -45,9 +51,13 @@ router.group("/modifiers", (router) => {
 router.group("/cart", (router) => {
   router.get("/", UserAuthCheck, getAllCartItems);
   router.post("/addItems", upload.any(), UserAuthCheck, addToCart);
-  router.delete("/deleteItem/:dishId", UserAuthCheck, deleteItem);
-  router.patch("/updateItem/:dishId", UserAuthCheck, updateItem);
-  router.post("/checkout", UserAuthCheck, checkout);
+  router.delete("/deleteItem/:itemId", UserAuthCheck, deleteItem);
+  router.patch("/updateItem/:itemId", UserAuthCheck, updateItem);
+  router.post("/checkout", upload.any(), UserAuthCheck, checkout);
+});
+
+router.group("/orders", (router) => {
+  router.get("/", getAllOrders);
 });
 
 export default router;

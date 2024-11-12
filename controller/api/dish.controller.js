@@ -4,7 +4,7 @@ import Submissions from "../../models/admin/submission.js";
 const getAlldishes = async (req, res) => {
   try {
     const dishes = await Submissions.find({})
-      .populate("category")
+      .populate("categories")
       .populate("modifiers")
       .sort({ created_at: -1 });
 
@@ -15,8 +15,27 @@ const getAlldishes = async (req, res) => {
   }
 };
 
+const getCategoryDishes = async (req, res) => {
+  console.log("hello");
+
+  try {
+    const { categoryId } = req.params;
+    console.log("data", categoryId);
+
+    const dishes = await Submissions.find({ categories: categoryId })
+      .populate("categories")
+      .populate("modifiers");
+    console.log("dishes", dishes);
+
+    res.status(200).json(dishes);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const createDish = async (req, res) => {
-  const { title, description, price, actualPrice, category, modifiers } =
+  const { title, description, price, actualPrice, categories, modifiers } =
     req.body;
 
   try {
@@ -33,7 +52,7 @@ const createDish = async (req, res) => {
       description,
       price,
       actualPrice,
-      category,
+      categories,
       modifiers,
     });
 
@@ -58,7 +77,9 @@ const getDish = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const dish = await Submissions.findById(id);
+    const dish = await Submissions.findById(id)
+      .populate("categories")
+      .populate("modifiers");
 
     if (!dish) {
       return res.status(404).json({ error: "No such dish available" });
@@ -94,14 +115,14 @@ const updateDish = async (req, res) => {
     const { id } = req.params;
     console.log(req.params);
 
-    const { title, description, price, category, modifiers } = req.body;
+    const { title, description, price, categories, modifiers } = req.body;
     console.log(req.body);
 
     const updatedData = {
       title,
       description,
       price,
-      category,
+      categories,
       modifiers,
     };
 
@@ -128,4 +149,11 @@ const updateDish = async (req, res) => {
   }
 };
 
-export { createDish, getAlldishes, getDish, deleteDish, updateDish };
+export {
+  createDish,
+  getAlldishes,
+  getDish,
+  deleteDish,
+  updateDish,
+  getCategoryDishes,
+};

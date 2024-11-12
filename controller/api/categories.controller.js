@@ -33,7 +33,7 @@ const getSortedDishes = async (req, res) => {
   const { sortOrder = "asc" } = req.query;
 
   try {
-    const dishes = await Submissions.find({ category: categoryId }).sort({
+    const dishes = await Submissions.find({ categories: categoryId }).sort({
       price: sortOrder === "asc" ? 1 : -1,
     });
     res.json(dishes);

@@ -26,12 +26,46 @@ const OrderSchema = new mongoose.Schema(
         ],
       },
     ],
+    status: {
+      type: String,
+      enum: [
+        "PENDING",
+        "CONFIRMED",
+        "PREPARING",
+        "OUT_FOR_DELIVERY",
+        "DELIVERED",
+        "CANCELLED",
+      ],
+      default: "PENDING",
+      required: true,
+    },
     totalAmount: {
       type: Number,
       required: true,
     },
+    fullName: {
+      type: String,
+      required: true,
+    },
+    mobile: {
+      type: Number,
+      required: true,
+    },
+
     address: {
       type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+    pincode: {
+      type: Number,
       required: true,
     },
   },
